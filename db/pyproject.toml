@@ -1,0 +1,23 @@
+# Tool configuration only. Dependencies live in requirements*.txt.
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S608"]
+
+[tool.ruff.format]
+exclude = ["migrations/versions"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["modelradar_db", "migrations/env.py", "tests"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

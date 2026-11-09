@@ -10,8 +10,9 @@ ModelRadar is a public-information site, not a SaaS product:
 - No sample, dummy or fabricated announcements. The database starts empty and fills only from real sources.
 - Every announcement links to its original official source. Titles are stored exactly as published.
 
-> **Status: Phase 0 (foundations) complete.** The stack runs and is empty by design. Source ingestion
-> starts in Phase 1. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status: Phase 0 complete; Phase 1A (database schema and migrations) implemented.** The stack
+> runs and the database is empty by design. Source ingestion comes in later phases. See
+> [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Architecture
 
@@ -26,6 +27,7 @@ Browser -> Next.js (web) -> FastAPI (api, GET only) -> PostgreSQL
 | `web/` | Next.js, TypeScript, Tailwind CSS. Public, read-only UI. |
 | `api/` | FastAPI. GET endpoints only; connects with a read-only database role. |
 | `worker/` | Python sync worker. The only component that writes to the database. |
+| `db/` | Alembic migrations, SQLAlchemy schema metadata and database tests. See [docs/DATABASE.md](docs/DATABASE.md). |
 | `config/` | Category taxonomy and (from Phase 1) company and source definitions. |
 | `docker/` | Container support files (database role initialisation). |
 | `scripts/` | Environment setup and project checks. |
@@ -54,7 +56,13 @@ Prerequisite: Docker Desktop (or Docker Engine) with Docker Compose v2.
    docker compose up --build
    ```
 
-3. Open the services (all bound to `127.0.0.1` only):
+3. Create the database schema (one-off, safe to repeat; runs as the owner role):
+
+   ```bash
+   docker compose run --rm migrate
+   ```
+
+4. Open the services (all bound to `127.0.0.1` only):
 
    | Service | URL |
    |---|---|
@@ -62,7 +70,7 @@ Prerequisite: Docker Desktop (or Docker Engine) with Docker Compose v2.
    | API | http://localhost:8000/health (docs at `/docs`) |
    | PostgreSQL | `localhost:5432` (credentials in `.env`) |
 
-4. Check health: `docker compose ps` should show every service as `healthy`.
+5. Check health: `docker compose ps` should show every service as `healthy`.
 
 Stop with `docker compose down`. Add `-v` to also delete the local database volume.
 
@@ -78,6 +86,9 @@ python scripts/check_privacy.py
 # API and worker (needs Python 3.12)
 cd api    && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
 cd worker && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
+
+# Database migrations and tests (needs Python 3.12 and TEST_DATABASE_ADMIN_URL; see docs/DATABASE.md)
+cd db && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
 
 # Web (needs Node 24 - see web/.nvmrc; Docker uses the same major version)
 cd web && npm install && npm run lint && npm run typecheck && npm run format:check && npm run build
