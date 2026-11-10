@@ -1,0 +1,102 @@
+# The approved ModelRadar category taxonomy: 17 top-level categories.
+# Categories are configuration, not announcement data. Edit via pull request.
+# Validate with: python scripts/validate_config.py
+categories:
+  - slug: language-reasoning
+    name: Language and Reasoning
+    children:
+      - { slug: frontier-llms, name: Frontier LLMs }
+      - { slug: open-weight-llms, name: Open-weight LLMs }
+      - { slug: small-on-device-models, name: Small and on-device models }
+      - { slug: reasoning-models, name: Reasoning models }
+  - slug: multimodal
+    name: Multimodal
+    children:
+      - { slug: vision-language, name: Vision-language models }
+      - { slug: omni-models, name: Omni models }
+  - slug: code-software
+    name: Code and Software
+    children:
+      - { slug: coding-models, name: Coding models }
+      - { slug: ai-ides-agents, name: AI IDEs and coding agents }
+  - slug: image-generation
+    name: Image Generation
+    children:
+      - { slug: diffusion-models, name: Diffusion models }
+      - { slug: image-editing, name: Image editing }
+  - slug: video-generation
+    name: Video Generation
+    children:
+      - { slug: text-image-to-video, name: Text and image to video }
+      - { slug: avatars, name: Avatars }
+  - slug: audio-speech-music
+    name: Audio, Speech and Music
+    children:
+      - { slug: text-to-speech, name: Text to speech }
+      - { slug: speech-recognition, name: Speech recognition }
+      - { slug: voice-agents, name: Voice agents }
+      - { slug: music-generation, name: Music generation }
+  - slug: embeddings-retrieval
+    name: Embeddings and Retrieval
+    children:
+      - { slug: embedding-models, name: Embedding models }
+      - { slug: rerankers, name: Rerankers }
+      - { slug: search, name: Search }
+  - slug: vision-perception
+    name: Vision and Perception
+    children:
+      - { slug: detection, name: Detection }
+      - { slug: segmentation, name: Segmentation }
+      - { slug: 3d-reconstruction, name: 3D reconstruction }
+  - slug: world-models-3d
+    name: World Models and 3D
+    children:
+      - { slug: world-models, name: World models }
+      - { slug: spatial-3d-generation, name: Spatial and 3D generation }
+  - slug: robotics-embodied
+    name: Robotics and Embodied AI
+    children:
+      - { slug: humanoids, name: Humanoids }
+      - { slug: robot-foundation-models, name: Robot foundation models }
+  - slug: autonomous-driving
+    name: Autonomous Driving
+    children:
+      - { slug: robotaxi, name: Robotaxi }
+      - { slug: adas, name: Driver assistance }
+  - slug: science-bio
+    name: Science and Bio
+    children:
+      - { slug: protein-drug-discovery, name: Protein and drug discovery }
+      - { slug: materials, name: Materials }
+      - { slug: weather-climate, name: Weather and climate }
+      - { slug: mathematics, name: Mathematics }
+  - slug: healthcare-medical
+    name: Healthcare and Medical
+    children:
+      - { slug: clinical-ai, name: Clinical AI }
+      - { slug: medical-imaging, name: Medical imaging }
+      - { slug: clinical-documentation, name: Clinical documentation }
+  - slug: agents-automation
+    name: Agents and Automation
+    children:
+      - { slug: agent-frameworks, name: Agent frameworks }
+      - { slug: computer-use, name: Computer use }
+      - { slug: browser-agents, name: Browser agents }
+  - slug: safety-evaluation
+    name: Safety and Evaluation
+    children:
+      - { slug: safety-research, name: Safety research }
+      - { slug: evaluations, name: Evaluations }
+      - { slug: guardrails, name: Guardrails }
+  - slug: infrastructure-hardware-inference
+    name: Infrastructure, Hardware and Inference
+    children:
+      - { slug: inference-platforms, name: Inference platforms }
+      - { slug: accelerators, name: Accelerators }
+      - { slug: edge-ai, name: Edge AI }
+  - slug: data-enterprise-recommenders
+    name: Data, Enterprise and Recommenders
+    children:
+      - { slug: data-platforms, name: Data platforms }
+      - { slug: recommender-systems, name: Recommender systems }
+      - { slug: finance-ai, name: Finance AI }

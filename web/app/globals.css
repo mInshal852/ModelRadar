@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens. Dark-first; follows the system color scheme. No stored preference. */
+:root {
+  --background: #0a0a0b;
+  --surface: #111113;
+  --border: #232327;
+  --foreground: #ededef;
+  --muted: #8b8b93;
+  --accent: #6e8bff;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #fafafa;
+    --surface: #ffffff;
+    --border: #e4e4e7;
+    --foreground: #111113;
+    --muted: #6b6b73;
+    --accent: #3b5bdb;
+    color-scheme: light;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

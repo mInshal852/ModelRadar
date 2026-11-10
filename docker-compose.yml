@@ -1,0 +1,94 @@
+# ModelRadar - local development stack.
+# Production deployment is intentionally not defined yet.
+name: modelradar
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-modelradar}
+      POSTGRES_USER: ${POSTGRES_OWNER_USER:-modelradar_owner}
+      POSTGRES_PASSWORD: ${POSTGRES_OWNER_PASSWORD:?Run scripts/init-env first}
+      WORKER_DB_PASSWORD: ${WORKER_DB_PASSWORD:?Run scripts/init-env first}
+      API_DB_PASSWORD: ${API_DB_PASSWORD:?Run scripts/init-env first}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:${DB_HOST_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://modelradar_api:${API_DB_PASSWORD:?Run scripts/init-env first}@db:5432/${POSTGRES_DB:-modelradar}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api/app:/app/app:ro
+    # Access logging is disabled so visitor IP addresses are never written to logs.
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--reload"]
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).status == 200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build: ./worker
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://modelradar_worker:${WORKER_DB_PASSWORD:?Run scripts/init-env first}@db:5432/${POSTGRES_DB:-modelradar}
+      CONFIG_DIR: /config
+      HEARTBEAT_FILE: /tmp/worker-heartbeat
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./worker/worker:/app/worker:ro
+      - ./config:/config:ro
+    healthcheck:
+      test: ["CMD", "python", "-m", "worker.healthcheck"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  web:
+    build:
+      context: ./web
+      target: dev
+    restart: unless-stopped
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+      API_INTERNAL_URL: http://api:8000
+      WATCHPACK_POLLING: "true"
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "127.0.0.1:${WEB_HOST_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+volumes:
+  pgdata:
