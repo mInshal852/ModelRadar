@@ -3,9 +3,12 @@
     python -m worker.cli validate-config [--config-dir DIR]
     python -m worker.cli verify-sources  [--config-dir DIR] [--slug SLUG ...] [--include-disabled]
     python -m worker.cli sync-config     [--config-dir DIR]
+    python -m worker.cli ingest          [--company SLUG] [--url URL] [--due-only]
+    python -m worker.cli sync-status
 
-`validate-config` and `verify-sources` need no database. `sync-config` uses DATABASE_URL
-(the worker role) and never deletes data.
+`validate-config` and `verify-sources` need no database. The others use DATABASE_URL (the
+worker role) and never delete data. `ingest` stores real announcements from enabled RSS/Atom
+sources; run `sync-config` first so the sources exist in the database.
 """
 
 import argparse
@@ -115,6 +118,85 @@ def cmd_sync(args: argparse.Namespace) -> int:
     return asyncio.run(_sync(config))
 
 
+async def _ingest(args: argparse.Namespace) -> int:
+    from sqlalchemy.ext.asyncio import create_async_engine
+
+    from worker.config import get_settings
+    from worker.ingest.runner import run_sources
+    from worker.ingest.service import make_fetcher
+
+    settings = get_settings()
+    engine = create_async_engine(settings.database_url)
+    try:
+        async with make_fetcher(settings) as fetcher:
+            reports = await run_sources(
+                engine,
+                fetcher,
+                only_due=args.due_only,
+                company=args.company,
+                url=args.url,
+            )
+    finally:
+        await engine.dispose()
+
+    totals = {"found": 0, "inserted": 0, "updated": 0, "filtered": 0, "invalid": 0, "failed": 0}
+    for r in reports:
+        extra = f" error={r.error}" if r.error else ""
+        print(
+            f"[{r.outcome.upper()}] {r.company} {r.url} http={r.http_status} found={r.found} "
+            f"inserted={r.store.inserted} updated={r.store.updated} unchanged={r.store.unchanged} "
+            f"filtered={r.filtered} invalid={r.invalid} dup_in_feed={r.duplicates_in_feed}{extra}"
+        )
+        totals["found"] += r.found
+        totals["inserted"] += r.store.inserted
+        totals["updated"] += r.store.updated
+        totals["filtered"] += r.filtered
+        totals["invalid"] += r.invalid
+        totals["failed"] += r.outcome == "failed"
+    print(f"\n{len(reports)} source(s) processed: {totals}")
+    return 1 if totals["failed"] else 0
+
+
+def cmd_ingest(args: argparse.Namespace) -> int:
+    return asyncio.run(_ingest(args))
+
+
+async def _status() -> int:
+    from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import create_async_engine
+
+    from worker.config import get_settings
+
+    engine = create_async_engine(get_settings().database_url)
+    query = text(
+        "SELECT c.slug AS company, s.url, coalesce(s.status, 'never-synced') AS status, "
+        "s.consecutive_failures AS failures, s.last_synced_at, s.last_error, "
+        "(SELECT count(*) FROM announcements a WHERE a.source_id = s.id) AS announcements, "
+        "r.status AS run_status, r.http_status, r.items_found, r.items_new, r.items_filtered "
+        "FROM sources s JOIN companies c ON c.id = s.company_id "
+        "LEFT JOIN LATERAL (SELECT * FROM sync_runs x WHERE x.source_id = s.id "
+        "ORDER BY x.started_at DESC LIMIT 1) r ON true ORDER BY c.slug, s.id"
+    )
+    try:
+        async with engine.connect() as conn:
+            rows = (await conn.execute(query)).mappings().all()
+    finally:
+        await engine.dispose()
+    for r in rows:
+        print(
+            f"{r['company']:<16} {r['status']:<13} failures={r['failures']} "
+            f"announcements={r['announcements']} last_run={r['run_status']} "
+            f"http={r['http_status']} found={r['items_found']} new={r['items_new']} "
+            f"filtered={r['items_filtered']}  {r['url']}"
+            + (f"\n    last_error: {r['last_error']}" if r["last_error"] else "")
+        )
+    return 0
+
+
+def cmd_status(args: argparse.Namespace) -> int:
+    return asyncio.run(_status())
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m worker.cli", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -123,10 +205,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         ("validate-config", cmd_validate, "validate config/ (no network, no database)"),
         ("verify-sources", cmd_verify, "fetch feeds and inspect their real content"),
         ("sync-config", cmd_sync, "idempotently load config into the database"),
+        ("ingest", cmd_ingest, "synchronise enabled RSS/Atom sources now"),
+        ("sync-status", cmd_status, "show source status and the last run of each source"),
     ):
         p = sub.add_parser(name, help=help_text)
         p.add_argument("--config-dir", type=Path, default=DEFAULT_CONFIG_DIR)
         p.set_defaults(func=func)
+        if name == "ingest":
+            p.add_argument("--company", help="only this company slug")
+            p.add_argument("--url", help="only the source with this exact URL")
+            p.add_argument(
+                "--due-only", action="store_true", help="only sources whose poll interval elapsed"
+            )
         if name == "verify-sources":
             p.add_argument("--slug", action="append", help="only this source slug (repeatable)")
             p.add_argument("--include-disabled", action="store_true")

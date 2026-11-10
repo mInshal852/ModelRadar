@@ -66,6 +66,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://modelradar_worker:${WORKER_DB_PASSWORD:?Run scripts/init-env first}@db:5432/${POSTGRES_DB:-modelradar}
       CONFIG_DIR: /config
       HEARTBEAT_FILE: /tmp/worker-heartbeat
+      # Recurring RSS/Atom ingestion; set INGESTION_ENABLED=false in .env to pause it.
+      INGESTION_ENABLED: ${INGESTION_ENABLED:-true}
     depends_on:
       db:
         condition: service_healthy

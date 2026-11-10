@@ -10,10 +10,10 @@ ModelRadar is a public-information site, not a SaaS product:
 - No sample, dummy or fabricated announcements. The database starts empty and fills only from real sources.
 - Every announcement links to its original official source. Titles are stored exactly as published.
 
-> **Status: Phase 0 and Phase 1A (database schema) complete; Phase 1B (official source
-> configuration) implemented.** Ten official sources are configured and verified, but no
-> announcements are collected yet. See [docs/ROADMAP.md](docs/ROADMAP.md) and
-> [docs/SOURCES.md](docs/SOURCES.md).
+> **Status: Phases 0, 1A and 1B complete; Phase 2 (RSS/Atom ingestion) implemented.** The worker
+> collects real announcements from the ten configured official feeds. There is no dashboard
+> yet. See [docs/ROADMAP.md](docs/ROADMAP.md), [docs/SOURCES.md](docs/SOURCES.md) and
+> [docs/INGESTION.md](docs/INGESTION.md).
 
 ## Architecture
 
@@ -72,6 +72,16 @@ Prerequisite: Docker Desktop (or Docker Engine) with Docker Compose v2.
 
    Source configuration, verification and relevance rules are explained in
    [docs/SOURCES.md](docs/SOURCES.md).
+
+   The worker then collects announcements automatically on each source's poll interval. To
+   collect immediately and see the result:
+
+   ```bash
+   docker compose run --rm worker python -m worker.cli ingest
+   docker compose run --rm worker python -m worker.cli sync-status
+   ```
+
+   Details: [docs/INGESTION.md](docs/INGESTION.md). Set `INGESTION_ENABLED=false` in `.env` to pause the recurring loop.
 
 4. Open the services (all bound to `127.0.0.1` only):
 

@@ -5,7 +5,8 @@
 | 0 | Foundations: monorepo, Docker Compose, env/credentials, privacy defaults, CI, docs | Implemented; pending approval |
 | 1A | Database schema and Alembic migrations, role permissions, migration tests | Implemented on `feature/database-schema`; pending review |
 | 1B | Official source configuration (first batch of 10), validation, feed content verification, relevance rules, idempotent config sync | Implemented on `feature/official-sources`; pending review |
-| 1C+ | Announcement ingestion pipeline, rule-based classification, scheduler, remaining feed batches | Not started |
+| 2 | RSS/Atom ingestion and synchronisation: conditional fetching, retries, robots.txt, duplicate prevention, run history, source status, recurring scheduler | Implemented on `feature/rss-ingestion`; pending review |
+| 3+ | Rule-based classification, model detection, remaining feed batches | Not started |
 | 2 | Models: per-company model-name patterns, versions, first-announced dates | Not started |
 | 3 | Public UI: Dashboard, Models, Categories, Companies, Sources, About. Playwright tests | Not started |
 | 4 | HTML extraction in small gated batches (about 5-8 sources each) | Not started |

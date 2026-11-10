@@ -69,17 +69,32 @@ def _alembic_config(url: URL) -> Config:
     return cfg
 
 
-@pytest.fixture
-def migrated_db_url(admin_url: URL) -> Iterator[URL]:
-    """A fresh disposable database migrated to head (psycopg URL)."""
-    name = TEST_DB_PREFIX + secrets.token_hex(6)
+@pytest.fixture(scope="session")
+def migrated_template(admin_url: URL) -> Iterator[str]:
+    """Name of a template database migrated once to head; tests copy it (fast)."""
+    name = TEST_DB_PREFIX + "tpl_" + secrets.token_hex(6)
     admin = create_engine(admin_url, isolation_level="AUTOCOMMIT")
     with admin.connect() as conn:
         conn.execute(text(f'CREATE DATABASE "{name}"'))
-    url = admin_url.set(database=name)
     try:
-        command.upgrade(_alembic_config(url), "head")
-        yield url
+        command.upgrade(_alembic_config(admin_url.set(database=name)), "head")
+        yield name
+    finally:
+        assert name.startswith(TEST_DB_PREFIX)
+        with admin.connect() as conn:
+            conn.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+        admin.dispose()
+
+
+@pytest.fixture
+def migrated_db_url(admin_url: URL, migrated_template: str) -> Iterator[URL]:
+    """A fresh disposable database, a copy of the migrated template (psycopg URL)."""
+    name = TEST_DB_PREFIX + secrets.token_hex(6)
+    admin = create_engine(admin_url, isolation_level="AUTOCOMMIT")
+    with admin.connect() as conn:
+        conn.execute(text(f'CREATE DATABASE "{name}" TEMPLATE "{migrated_template}"'))
+    try:
+        yield admin_url.set(database=name)
     finally:
         assert name.startswith(TEST_DB_PREFIX)
         with admin.connect() as conn:
@@ -94,6 +109,33 @@ async def engine(migrated_db_url: URL) -> AsyncIterator[AsyncEngine]:
         yield async_engine
     finally:
         await async_engine.dispose()
+
+
+def _role_engine(url: URL, role: str) -> AsyncEngine:
+    """An engine whose every connection acts as `role` (a superuser may SET ROLE)."""
+    return create_async_engine(
+        url.set(drivername="postgresql+asyncpg"),
+        connect_args={"server_settings": {"role": role}},
+    )
+
+
+@pytest_asyncio.fixture
+async def worker_engine(migrated_db_url: URL) -> AsyncIterator[AsyncEngine]:
+    """Acts as modelradar_worker, exactly like the production worker."""
+    eng = _role_engine(migrated_db_url, "modelradar_worker")
+    try:
+        yield eng
+    finally:
+        await eng.dispose()
+
+
+@pytest_asyncio.fixture
+async def api_engine(migrated_db_url: URL) -> AsyncIterator[AsyncEngine]:
+    eng = _role_engine(migrated_db_url, "modelradar_api")
+    try:
+        yield eng
+    finally:
+        await eng.dispose()
 
 
 # --- config directory builder (synthetic YAML used only by tests) --------------------------
