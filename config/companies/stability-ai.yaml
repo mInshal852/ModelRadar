@@ -1,0 +1,20 @@
+slug: stability-ai
+name: Stability AI
+website_url: https://stability.ai
+country: GB
+categories: [image-generation, video-generation, audio-speech-music]
+sources:
+  - slug: stability-ai-news
+    name: Stability AI news
+    kind: rss
+    url: https://stability.ai/news-updates?format=rss
+    hosting: first_party
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 20 entries dated 2025-03-18 to 2026-08-25. Every entry has a
+      title, link, date and description. The newest entry was 76 days old, so this source posts
+      infrequently (roughly monthly); that is not treated as stale. Entries mix model and product
+      announcements with company news such as funding. All links are on stability.ai.
+    poll_interval_minutes: 240

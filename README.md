@@ -10,9 +10,10 @@ ModelRadar is a public-information site, not a SaaS product:
 - No sample, dummy or fabricated announcements. The database starts empty and fills only from real sources.
 - Every announcement links to its original official source. Titles are stored exactly as published.
 
-> **Status: Phase 0 complete; Phase 1A (database schema and migrations) implemented.** The stack
-> runs and the database is empty by design. Source ingestion comes in later phases. See
-> [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status: Phase 0 and Phase 1A (database schema) complete; Phase 1B (official source
+> configuration) implemented.** Ten official sources are configured and verified, but no
+> announcements are collected yet. See [docs/ROADMAP.md](docs/ROADMAP.md) and
+> [docs/SOURCES.md](docs/SOURCES.md).
 
 ## Architecture
 
@@ -62,6 +63,16 @@ Prerequisite: Docker Desktop (or Docker Engine) with Docker Compose v2.
    docker compose run --rm migrate
    ```
 
+   Then load the official company and source configuration (idempotent, never deletes, never
+   creates announcements):
+
+   ```bash
+   docker compose run --rm worker python -m worker.cli sync-config
+   ```
+
+   Source configuration, verification and relevance rules are explained in
+   [docs/SOURCES.md](docs/SOURCES.md).
+
 4. Open the services (all bound to `127.0.0.1` only):
 
    | Service | URL |
@@ -79,13 +90,14 @@ Stop with `docker compose down`. Add `-v` to also delete the local database volu
 Run the same checks as CI:
 
 ```bash
-# Config and privacy guards (needs: pip install pyyaml)
+# Config and privacy guards (needs: pip install -r worker/requirements.txt)
 python scripts/validate_config.py
 python scripts/check_privacy.py
 
 # API and worker (needs Python 3.12)
 cd api    && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
 cd worker && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
+# (worker database tests also need TEST_DATABASE_ADMIN_URL, like the db/ tests)
 
 # Database migrations and tests (needs Python 3.12 and TEST_DATABASE_ADMIN_URL; see docs/DATABASE.md)
 cd db && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest

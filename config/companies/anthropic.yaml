@@ -1,0 +1,27 @@
+slug: anthropic
+name: Anthropic
+website_url: https://www.anthropic.com
+country: US
+official_domains: [claude.com]
+categories: [language-reasoning, safety-evaluation]
+sources:
+  - slug: anthropic-api-release-notes
+    name: Claude Platform (API) release notes
+    kind: rss
+    url: https://platform.claude.com/docs/en/release-notes/feed.xml
+    hosting: first_party
+    hosting_notes: >-
+      platform.claude.com is Anthropic's Claude platform domain; the former docs.anthropic.com
+      release-notes page redirects to it.
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 167 entries dated 2024-05-10 to 2026-11-09, newest 1 day old.
+      Every entry has a title, link, date and description. Entries are individual changes under
+      date-based digest titles, so many entries share the same title (for example "Claude Platform
+      release notes - November 9, 2026"); each has a unique link with an anchor
+      (.../overview#anchor), so URLs stay unique. Descriptions are HTML lists. Model names must
+      be read from the description, not the title. This is API release notes, not the Anthropic
+      news page, which has no RSS feed.
+    poll_interval_minutes: 60
