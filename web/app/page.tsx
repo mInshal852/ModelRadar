@@ -1,40 +1,97 @@
-// Phase 0 placeholder. The real dashboard is built in a later phase.
-// This page only confirms that the web app can reach the API.
-export const dynamic = "force-dynamic";
+/* eslint-disable @next/next/no-html-link-for-pages -- same-page navigation uses full page loads on purpose (see lib/navigate.ts) */
+import { FilterBar } from "@/components/filter-bar";
+import { Feed } from "@/components/feed";
+import { Pagination } from "@/components/pagination";
+import { buttonClass, EmptyState, ErrorState, PageHeader } from "@/components/ui";
+import { load } from "@/lib/api";
+import { activeParams, hasFilters, readDashboardFilters, type RawSearchParams } from "@/lib/params";
+import type { Announcement, Category, Company, Page } from "@/lib/types";
 
-async function apiIsReachable(): Promise<boolean> {
-  const base = process.env.API_INTERNAL_URL;
-  if (!base) return false;
-  try {
-    const res = await fetch(`${base}/health`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(3000),
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
+export const metadata = { title: "AI Intelligence" };
 
-export default async function Home() {
-  const reachable = await apiIsReachable();
+const PAGE_SIZE = 20;
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<RawSearchParams>;
+}) {
+  const filters = readDashboardFilters(await searchParams);
+  const [feed, categories, companies] = await Promise.all([
+    load<Page<Announcement>>("/v1/announcements", {
+      q: filters.q,
+      category: filters.category,
+      company: filters.company,
+      kind: filters.kind,
+      published_from: filters.from,
+      published_to: filters.to,
+      page: filters.page,
+      page_size: PAGE_SIZE,
+    }),
+    load<Category[]>("/v1/categories"),
+    load<Page<Company>>("/v1/companies", { page_size: 100 }),
+  ]);
+
+  const params = activeParams(filters);
+  const filtered = hasFilters(filters);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-6">
-      <div>
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">Phase 0</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">ModelRadar</h1>
-        <p className="mt-3 text-muted">
-          Official AI model announcements, collected only from official company sources. No
-          announcements have been collected yet.
-        </p>
-      </div>
-      <div className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
-        <span className="text-muted">API status: </span>
-        <span className={reachable ? "text-foreground" : "text-muted"}>
-          {reachable ? "reachable" : "unreachable"}
-        </span>
-      </div>
-    </main>
+    <>
+      <PageHeader
+        title="AI Intelligence"
+        description="Announcements from the official blogs, release notes and feeds of AI companies, collected automatically. Every entry links to its original source."
+      >
+        <FilterBar
+          filters={filters}
+          categories={categories.data ?? []}
+          companies={companies.data?.items ?? []}
+          total={feed.data?.total ?? null}
+        />
+      </PageHeader>
+
+      {feed.error ? (
+        feed.error.status === 422 ? (
+          <ErrorState title="Some filters are not valid" retryHref="/">
+            {feed.error.message} Clear the filters to see all announcements.
+          </ErrorState>
+        ) : (
+          <ErrorState
+            title="Announcements are unavailable"
+            retryHref={`/${Object.keys(params).length ? `?${new URLSearchParams(params)}` : ""}`}
+          />
+        )
+      ) : feed.data.total === 0 ? (
+        filtered ? (
+          <EmptyState
+            title="No announcements match"
+            action={
+              <a href="/" className={buttonClass("secondary")}>
+                Clear filters
+              </a>
+            }
+          >
+            Nothing in the collected announcements matches these filters. Try fewer filters or a
+            different search term.
+          </EmptyState>
+        ) : (
+          <EmptyState title="No announcements collected yet">
+            The worker collects announcements from the configured official sources on a schedule.
+            Check the Sources page for the status of each source.
+          </EmptyState>
+        )
+      ) : (
+        <>
+          <Feed items={feed.data.items} />
+          <Pagination params={params} page={feed.data.page} pages={feed.data.pages} />
+          {feed.data.items.length === 0 ? (
+            <EmptyState title="This page is past the end of the results">
+              <a href="/" className="text-accent hover:underline">
+                Go back to the first page
+              </a>
+            </EmptyState>
+          ) : null}
+        </>
+      )}
+    </>
   );
 }

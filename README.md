@@ -10,9 +10,10 @@ ModelRadar is a public-information site, not a SaaS product:
 - No sample, dummy or fabricated announcements. The database starts empty and fills only from real sources.
 - Every announcement links to its original official source. Titles are stored exactly as published.
 
-> **Status: Phases 0, 1A and 1B complete; Phase 2 (RSS/Atom ingestion) implemented.** The worker
-> collects real announcements from the ten configured official feeds. There is no dashboard
-> yet. See [docs/ROADMAP.md](docs/ROADMAP.md), [docs/SOURCES.md](docs/SOURCES.md) and
+> **Status: Phases 0-2 complete; Phase 3 (frontend dashboard and read API) implemented.** The
+> worker collects real announcements from ten official feeds and the web app shows them.
+> See [docs/ROADMAP.md](docs/ROADMAP.md), [docs/DESIGN.md](docs/DESIGN.md),
+> [docs/API.md](docs/API.md), [docs/SOURCES.md](docs/SOURCES.md) and
 > [docs/INGESTION.md](docs/INGESTION.md).
 
 ## Architecture
@@ -105,7 +106,7 @@ python scripts/validate_config.py
 python scripts/check_privacy.py
 
 # API and worker (needs Python 3.12)
-cd api    && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
+cd api    && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest   # needs TEST_DATABASE_ADMIN_URL
 cd worker && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
 # (worker database tests also need TEST_DATABASE_ADMIN_URL, like the db/ tests)
 
@@ -113,7 +114,8 @@ cd worker && pip install -r requirements-dev.txt && ruff check . && ruff format 
 cd db && pip install -r requirements-dev.txt && ruff check . && ruff format --check . && mypy && pytest
 
 # Web (needs Node 24 - see web/.nvmrc; Docker uses the same major version)
-cd web && npm install && npm run lint && npm run typecheck && npm run format:check && npm run build
+cd web && npm install && npm run lint && npm run typecheck && npm run format:check && npm test && npm run build
+# Browser checks against a production build and the running stack: see docs/DESIGN.md
 ```
 
 Commit `web/package-lock.json` after the first `npm install` so CI uses `npm ci`.

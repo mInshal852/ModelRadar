@@ -48,9 +48,14 @@ The worker fetches enabled RSS/Atom sources on their poll intervals and stores a
 and run history; see [INGESTION.md](INGESTION.md). It runs as the write-capable worker role.
 The API stays read-only.
 
+## Frontend and read API (Phase 3)
+
+The API exposes GET-only endpoints ([API.md](API.md)); the Next.js app renders them on the server
+([DESIGN.md](DESIGN.md)). Browsers never call the API directly.
+
 ## Phase 0 scope
 
 Included: monorepo, Docker Compose (db, api, worker, web), environment and credential handling,
 privacy defaults, CI, linting, docs, the 17-category taxonomy file.
 
-Not included (later phases): classification, models detection, the dashboard, HTML extraction.
+Not included (later phases): classification, models detection, HTML extraction.

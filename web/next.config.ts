@@ -20,6 +20,7 @@ const csp = [
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  devIndicators: false,
   reactStrictMode: true,
   async headers() {
     return [

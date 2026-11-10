@@ -31,6 +31,23 @@ jobs:
     defaults:
       run:
         working-directory: api
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: modelradar_owner
+          # Throwaway credential for the CI-only service container; not used anywhere else.
+          POSTGRES_PASSWORD: ci-throwaway
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U modelradar_owner"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_ADMIN_URL: postgresql+psycopg://modelradar_owner:ci-throwaway@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -117,7 +134,7 @@ jobs:
       - run: pytest
 
   web:
-    name: Web (lint, format, build, types)
+    name: Web (lint, format, unit tests, build, types)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -134,6 +151,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
+      - run: npm test
       # The build generates next-env.d.ts and route types that tsc depends on,
       # so the standalone type check runs after it.
       - run: npm run build
