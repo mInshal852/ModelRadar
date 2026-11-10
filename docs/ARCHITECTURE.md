@@ -42,10 +42,15 @@ Companies and sources are YAML in `config/`, validated and loaded into the datab
 worker (`python -m worker.cli sync-config`); see [SOURCES.md](SOURCES.md). The worker can also
 inspect feeds (`verify-sources`) but does not yet store announcements.
 
+## Ingestion (Phase 2)
+
+The worker fetches enabled RSS/Atom sources on their poll intervals and stores announcements
+and run history; see [INGESTION.md](INGESTION.md). It runs as the write-capable worker role.
+The API stays read-only.
+
 ## Phase 0 scope
 
 Included: monorepo, Docker Compose (db, api, worker, web), environment and credential handling,
 privacy defaults, CI, linting, docs, the 17-category taxonomy file.
 
-Not included (later phases): announcement ingestion and scheduling, classification, models
-detection, the dashboard, HTML extraction.
+Not included (later phases): classification, models detection, the dashboard, HTML extraction.

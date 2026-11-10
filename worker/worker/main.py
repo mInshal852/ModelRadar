@@ -1,8 +1,7 @@
 """ModelRadar sync worker.
 
-Phase 0: foundation only. The worker connects to the database with its own
-role and keeps a heartbeat. Fetching, extraction and classification are added
-in Phase 1 and later; nothing here collects or stores announcements yet.
+Keeps a heartbeat and, when enabled, runs the recurring RSS/Atom ingestion loop. Each source
+is synchronised on its configured poll interval; overlapping runs are prevented per source.
 """
 
 import asyncio
@@ -15,6 +14,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from worker.config import get_settings
 from worker.heartbeat import write_heartbeat
+from worker.ingest.service import ingestion_loop
 
 logger = logging.getLogger("modelradar.worker")
 
@@ -29,7 +29,16 @@ async def run() -> None:
         with contextlib.suppress(NotImplementedError):
             loop.add_signal_handler(sig, stop.set)
 
-    logger.info("worker started (environment=%s)", settings.environment)
+    logger.info(
+        "worker started (environment=%s, ingestion=%s)",
+        settings.environment,
+        "on" if settings.ingestion_enabled else "off",
+    )
+    ingestion_task = (
+        asyncio.create_task(ingestion_loop(engine, settings, stop))
+        if settings.ingestion_enabled
+        else None
+    )
     try:
         while not stop.is_set():
             try:
@@ -41,6 +50,11 @@ async def run() -> None:
             with contextlib.suppress(TimeoutError):
                 await asyncio.wait_for(stop.wait(), timeout=settings.heartbeat_interval_seconds)
     finally:
+        stop.set()
+        if ingestion_task is not None:
+            ingestion_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError, Exception):
+                await ingestion_task
         await engine.dispose()
         logger.info("worker stopped")
 
