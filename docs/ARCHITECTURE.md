@@ -30,10 +30,16 @@ Browser -> Next.js (public, read-only) -> FastAPI (GET only) -> PostgreSQL
 - Source verification levels: `http_only`, `content_sampled`, `content_verified`. Third-party-hosted
   publications are flagged separately.
 
+## Database (Phase 1A)
+
+The schema and Alembic migrations are implemented; see [DATABASE.md](DATABASE.md). Migrations
+run with the owner role through the on-demand `migrate` Compose service. No data is loaded:
+tables start empty.
+
 ## Phase 0 scope
 
 Included: monorepo, Docker Compose (db, api, worker, web), environment and credential handling,
 privacy defaults, CI, linting, docs, the 17-category taxonomy file.
 
-Not included (later phases): database schema/migrations, feed ingestion, classification, models,
-the dashboard, HTML extraction.
+Not included (later phases): feed ingestion, classification, models detection, the dashboard,
+HTML extraction.

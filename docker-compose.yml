@@ -23,6 +23,20 @@ services:
       timeout: 5s
       retries: 10
 
+  # One-shot schema migrations, run on demand with the OWNER role (never by api/worker):
+  #   docker compose run --rm migrate                      # upgrade to latest
+  #   docker compose run --rm migrate alembic current      # show current version
+  migrate:
+    profiles: ["tools"]
+    build: ./db
+    environment:
+      MIGRATION_DATABASE_URL: postgresql+psycopg://${POSTGRES_OWNER_USER:-modelradar_owner}:${POSTGRES_OWNER_PASSWORD:?Run scripts/init-env first}@db:5432/${POSTGRES_DB:-modelradar}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./db:/app
+
   api:
     build: ./api
     restart: unless-stopped

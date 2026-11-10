@@ -25,6 +25,8 @@ MANIFESTS = [
     "api/requirements-dev.txt",
     "worker/requirements.txt",
     "worker/requirements-dev.txt",
+    "db/requirements.txt",
+    "db/requirements-dev.txt",
 ]
 
 # Strings that must never appear in web source (third-party fonts / trackers).
