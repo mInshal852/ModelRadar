@@ -2,32 +2,110 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens. Dark-first; follows the system color scheme. No stored preference. */
-:root {
-  --background: #0a0a0b;
-  --surface: #111113;
-  --border: #232327;
-  --foreground: #ededef;
-  --muted: #8b8b93;
-  --accent: #6e8bff;
+/*
+  ModelRadar design tokens (see docs/DESIGN.md).
+  Dark is the default. The theme is chosen by data-theme on <html>, set before first paint
+  from a preference kept only in this browser's localStorage. Nothing is sent to a server.
+*/
+:root,
+:root[data-theme="dark"] {
+  --bg: #0c1013;
+  --surface: #12171b;
+  --raised: #181e23;
+  --border: #232b32;
+  --border-strong: #33404a;
+  --text: #e8edf0;
+  --muted: #9aa6af;
+  --faint: #6f7c86;
+  --accent: #55bfd0;
+  --accent-ink: #06222a;
+  --accent-soft: rgba(85, 191, 208, 0.12);
+  --signal: #e2a948;
+  --signal-soft: rgba(226, 169, 72, 0.13);
+  --ok: #5cbf8c;
+  --warn: #e2a948;
+  --danger: #ee7a6c;
+  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.45);
   color-scheme: dark;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #fafafa;
-    --surface: #ffffff;
-    --border: #e4e4e7;
-    --foreground: #111113;
-    --muted: #6b6b73;
-    --accent: #3b5bdb;
-    color-scheme: light;
-  }
+:root[data-theme="light"] {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --raised: #eff1ed;
+  --border: #dde1da;
+  --border-strong: #c5cbc2;
+  --text: #12181c;
+  --muted: #55626b;
+  --faint: #7a868e;
+  --accent: #0b7285;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(11, 114, 133, 0.09);
+  --signal: #9a5b00;
+  --signal-soft: rgba(154, 91, 0, 0.1);
+  --ok: #1f7a4f;
+  --warn: #9a5b00;
+  --danger: #b3382c;
+  --shadow-pop: 0 10px 30px rgba(18, 24, 28, 0.14);
+  color-scheme: light;
+}
+
+html {
+  background: var(--bg);
+  scroll-padding-top: 4.5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  font-feature-settings: "tnum" 1;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* One visible focus treatment for everything keyboard-reachable. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Titles of announcements and pages use the serif; everything else uses the sans. */
+.font-title {
+  font-family: "Newsreader Variable", ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--raised) 25%, var(--border) 50%, var(--raised) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 6px;
 }

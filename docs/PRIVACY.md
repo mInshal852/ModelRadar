@@ -8,9 +8,9 @@ ModelRadar publishes public information only and collects nothing about its visi
 | No personal data stored | Database schema contains public announcement data only |
 | No analytics or tracking | No analytics dependencies; `scripts/check_privacy.py` fails CI if one appears |
 | No telemetry | `NEXT_TELEMETRY_DISABLED=1` in Docker/CI; `next telemetry disable` runs before dev/build |
-| Self-hosted fonts | Inter and JetBrains Mono come from npm (`@fontsource-variable/*`); no Google Fonts or CDNs |
+| Self-hosted fonts | Instrument Sans and Newsreader come from npm (`@fontsource-variable/*`); no Google Fonts or CDNs |
 | No third-party requests from visitors' browsers | CSP restricts scripts, styles, images, fonts and connections to `self` |
-| No cookies | The app sets none; theme follows the system preference without storing anything |
+| No cookies | The app sets none (a test enforces it). The light/dark choice is kept only in this browser's `localStorage` and never sent anywhere |
 | No visitor IPs in logs | API access log disabled; Next.js does not log client IPs |
 | Referrer privacy | `Referrer-Policy: no-referrer`; outbound links will also use `rel="noopener noreferrer"` |
 
