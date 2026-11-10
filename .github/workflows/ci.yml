@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install pyyaml==6.0.2
+      - run: pip install -r worker/requirements.txt
       - run: python scripts/validate_config.py
       - run: python scripts/check_privacy.py
 
@@ -50,6 +50,23 @@ jobs:
     defaults:
       run:
         working-directory: worker
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: modelradar_owner
+          # Throwaway credential for the CI-only service container; not used anywhere else.
+          POSTGRES_PASSWORD: ci-throwaway
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U modelradar_owner"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_ADMIN_URL: postgresql+psycopg://modelradar_owner:ci-throwaway@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

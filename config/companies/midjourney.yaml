@@ -1,0 +1,22 @@
+slug: midjourney
+name: Midjourney
+website_url: https://www.midjourney.com
+country: US
+categories: [image-generation]
+sources:
+  - slug: midjourney-updates
+    name: Midjourney updates
+    kind: rss
+    url: https://updates.midjourney.com/rss/
+    hosting: first_party
+    hosting_notes: >-
+      Served from the updates.midjourney.com subdomain. Which platform hosts it was not verified.
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 15 entries dated 2026-06-16 to 2026-10-08. Every entry has a
+      title, link, date and description. Descriptions are HTML. Entries are tagged "Change Log"
+      (8) or "Announcement" (7). Newest entry was 32 days old. All links are on
+      updates.midjourney.com.
+    poll_interval_minutes: 120

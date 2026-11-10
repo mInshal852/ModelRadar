@@ -1,0 +1,19 @@
+slug: pika
+name: Pika
+website_url: https://pika.art
+categories: [video-generation]
+sources:
+  - slug: pika-blog
+    name: Pika blog
+    kind: rss
+    url: https://pika.art/blog/feed.xml
+    hosting: first_party
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 15 entries dated 2026-04-02 to 2026-10-29, newest 12 days old.
+      Every entry has a title, link, date and description. Entries are tagged "New Release" (9),
+      "Research" (5) or "Culture" (1, a community spotlight). Dates are at 00:00:00 GMT, which
+      suggests day-level precision. All links are on pika.art.
+    poll_interval_minutes: 240

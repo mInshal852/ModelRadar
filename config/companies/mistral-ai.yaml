@@ -1,0 +1,20 @@
+slug: mistral-ai
+name: Mistral AI
+website_url: https://mistral.ai
+country: FR
+categories: [language-reasoning, code-software]
+sources:
+  - slug: mistral-news
+    name: Mistral AI news
+    kind: rss
+    url: https://mistral.ai/news/rss
+    hosting: first_party
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 94 entries dated 2023-09-27 to 2026-11-05, newest 4 days old.
+      Every entry has a title, link and date; only 32/94 have a description (the rest stay NULL).
+      All links are on mistral.ai. The feed is served as text/plain but parses as valid RSS 2.0.
+      Dates are in GMT. Entries are model, product and company news.
+    poll_interval_minutes: 60

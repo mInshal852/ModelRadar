@@ -1,0 +1,21 @@
+slug: allen-ai
+name: Allen Institute for AI
+website_url: https://allenai.org
+country: US
+categories: [language-reasoning, science-bio]
+sources:
+  - slug: allen-ai-news
+    name: Ai2 news and research
+    kind: rss
+    url: https://allenai.org/rss.xml
+    hosting: first_party
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 25 entries dated 2026-08-21 to 2026-11-06, newest 3 days old.
+      Every entry has a title, link, date and description. Descriptions contain embedded HTML
+      markup (div elements) and must be sanitised before display. Dates are ISO 8601 with a -08:00
+      offset at midnight, which suggests day-level precision. All links are on allenai.org.
+      Entries are model, dataset and research posts.
+    poll_interval_minutes: 120

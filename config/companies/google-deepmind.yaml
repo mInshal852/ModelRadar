@@ -1,0 +1,20 @@
+slug: google-deepmind
+name: Google DeepMind
+website_url: https://deepmind.google
+country: GB
+categories: [language-reasoning, multimodal, science-bio]
+sources:
+  - slug: google-deepmind-blog
+    name: Google DeepMind blog
+    kind: rss
+    url: https://deepmind.google/blog/rss.xml
+    hosting: first_party
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 100 entries dated 2025-11-24 to 2026-11-05, newest 4 days old.
+      Every entry has a title, link and publication date; 70/100 have a description (the other 30
+      stay NULL). All links are on deepmind.google. The feed carries no category tags. Entries are
+      model, product and research posts.
+    poll_interval_minutes: 60

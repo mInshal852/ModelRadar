@@ -1,0 +1,55 @@
+slug: openai
+name: OpenAI
+website_url: https://openai.com
+country: US
+official_domains: [developers.openai.com]
+categories: [language-reasoning, multimodal]
+sources:
+  - slug: openai-news
+    name: OpenAI news
+    kind: rss
+    url: https://openai.com/news/rss.xml
+    hosting: first_party
+    content_scope: mixed
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 1370 entries dated 2015-12-11 to 2026-11-09 (newest today).
+      Every entry has a title, link and date; 1264 have a description; 2 links appear twice. The
+      feed is mixed: tags include Product (181), Research (205), Safety (111), Company (237),
+      Global Affairs (122), Story (65), OpenAI Academy (30) and Startup (26), and 156 entries have
+      no tag at all (in a sample of the latest ones these were customer stories). The relevance
+      rules keep only entries tagged Product, Research, Publication, Safety, Safety & Alignment,
+      Engineering or Release; entries tagged only Company, Global Affairs, Story, Startup,
+      Academy or untagged are dropped. This favours precision over recall, so some real
+      announcements tagged only "Company" are not collected until the rules are revised.
+      The HTML news page returns 403 to automated clients and is not used.
+    poll_interval_minutes: 30
+    relevance_rules:
+      include_categories:
+        - Product
+        - Research
+        - Publication
+        - Safety
+        - Safety & Alignment
+        - Engineering
+        - Release
+  - slug: openai-developers-feed
+    name: OpenAI developers site feed
+    kind: rss
+    url: https://developers.openai.com/rss.xml
+    hosting: first_party
+    content_scope: mixed
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed re-inspected 2026-11-10: it parses and all 135 entries have a title, link, date and
+      description, but entries are dated 2024-05-29 to 2026-05-05 (newest 189 days old), 6 links
+      are duplicated, and 49/135 links point to third-party hosts (YouTube, Vimeo, GitHub and
+      openai.github.io). Sampled titles are developer guides and documentation topics rather than
+      announcements.
+    poll_interval_minutes: 240
+    enabled: false
+    disabled_reason: >-
+      Not an announcement feed: it mostly lists documentation and guide updates, has gone quiet
+      since 2026-05, and links to third-party hosts. Re-enable only after reviewing its content.

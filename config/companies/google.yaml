@@ -1,0 +1,27 @@
+slug: google
+name: Google
+website_url: https://about.google
+country: US
+official_domains: [blog.google, google.com]
+categories: [language-reasoning, multimodal]
+sources:
+  - slug: google-ai-blog
+    name: Google AI blog (The Keyword, AI topic)
+    kind: rss
+    url: https://blog.google/innovation-and-ai/technology/ai/rss/
+    hosting: first_party
+    content_scope: mixed
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 20 entries dated 2026-09-09 to 2026-11-05. Every entry has a
+      title, link, date and description. All 20 carry the feed tag "AI". The feed is mixed: besides
+      model and product posts it includes tangential posts (for example an economy report, a film
+      trailer, Search features). The descriptions for at least some entries read like image alt
+      text rather than a summary, so treat them as unreliable. The "AI" category rule below only
+      guards against non-AI items appearing in this feed later; it does not remove the tangential
+      posts, which the later classification stage labels "other". The old URL
+      blog.google/technology/ai/rss/ redirects here.
+    poll_interval_minutes: 60
+    relevance_rules:
+      include_categories: [AI]

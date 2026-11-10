@@ -36,10 +36,16 @@ The schema and Alembic migrations are implemented; see [DATABASE.md](DATABASE.md
 run with the owner role through the on-demand `migrate` Compose service. No data is loaded:
 tables start empty.
 
+## Official sources (Phase 1B)
+
+Companies and sources are YAML in `config/`, validated and loaded into the database by the
+worker (`python -m worker.cli sync-config`); see [SOURCES.md](SOURCES.md). The worker can also
+inspect feeds (`verify-sources`) but does not yet store announcements.
+
 ## Phase 0 scope
 
 Included: monorepo, Docker Compose (db, api, worker, web), environment and credential handling,
 privacy defaults, CI, linting, docs, the 17-category taxonomy file.
 
-Not included (later phases): feed ingestion, classification, models detection, the dashboard,
-HTML extraction.
+Not included (later phases): announcement ingestion and scheduling, classification, models
+detection, the dashboard, HTML extraction.

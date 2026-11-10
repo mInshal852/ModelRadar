@@ -1,0 +1,19 @@
+slug: voyage-ai
+name: Voyage AI
+website_url: https://www.voyageai.com
+categories: [embeddings-retrieval]
+sources:
+  - slug: voyage-ai-blog
+    name: Voyage AI blog
+    kind: rss
+    url: https://blog.voyageai.com/feed/
+    hosting: first_party
+    content_scope: dedicated_ai
+    verification_level: content_sampled
+    verified_at: 2026-11-10
+    verification_notes: >-
+      Feed inspected 2026-11-10: 10 entries dated 2025-10-22 to 2026-10-28 (the feed only exposes
+      the latest 10), newest 13 days old. Every entry has a title, link, date and description. All
+      entries are tagged "News"; some are announcements of models, others are tutorials. All links
+      are on blog.voyageai.com.
+    poll_interval_minutes: 240
