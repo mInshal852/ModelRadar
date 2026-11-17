@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 from worker.sources.loader import ConfigError, load_config, normalize_url, validate_config_dir
-from worker.sources.schema import INGESTIBLE_KINDS
+from worker.sources.schema import INGESTIBLE_KINDS, SourceConfig
 
 REPO_CONFIG = Path(__file__).resolve().parents[2] / "config"
 
@@ -342,3 +342,9 @@ def test_robots_override_needs_a_reason_and_a_flag(make_config: Builder) -> None
         acme=company(sources=[source(ignore_robots_txt=True, robots_override_reason="owner")]),
     )
     assert ok == []
+
+
+def test_robots_override_is_off_by_default_and_unused_in_repo_config() -> None:
+    assert SourceConfig.model_fields["ignore_robots_txt"].default is False
+    config = load_config(REPO_CONFIG)
+    assert [s.slug for c in config.companies for s in c.sources if s.ignore_robots_txt] == []
