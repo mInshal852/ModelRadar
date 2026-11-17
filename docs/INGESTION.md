@@ -34,7 +34,7 @@ read-only.
 2. **Record.** A `sync_runs` row (`running`) is committed before fetching, so crashes stay
    visible. Leftover `running` rows from a crashed run are closed as failed.
 3. **Fetch.** Conditional request (`If-None-Match` / `If-Modified-Since` from the stored
-   `etag` / `last_modified`), robots.txt respected, per-domain minimum interval (2 s), timeout
+   `etag` / `last_modified`), robots.txt respected (unless the source has the explicit `ignore_robots_txt` owner override), per-domain minimum interval (2 s), timeout
    (20 s), up to 3 attempts with exponential backoff and jitter for network errors, 429 and
    5xx (a `Retry-After` up to 60 s is honoured; a longer one stops retrying). 401, 403, 404, 410
    and other 4xx are not retried and nothing is done to get around them.

@@ -50,7 +50,7 @@ def test_upgrade_from_empty_database_creates_all_tables(empty_db_url: URL) -> No
 def test_version_is_tracked_and_matches_head(empty_db_url: URL) -> None:
     cfg = alembic_config(empty_db_url)
     head = ScriptDirectory.from_config(cfg).get_current_head()
-    assert head == "0001"
+    assert head == "0002"
 
     command.upgrade(cfg, "head")
     engine = create_engine(empty_db_url)

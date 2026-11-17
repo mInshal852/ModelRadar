@@ -20,3 +20,8 @@ sources:
       (8) or "Announcement" (7). Newest entry was 32 days old. All links are on
       updates.midjourney.com.
     poll_interval_minutes: 120
+    enabled: false
+    disabled_reason: >-
+      Checked 2026-11-17: the feed now redirects to /private/ (a login area) and robots.txt
+      disallows everything, so it is no longer public. The robots.txt override does not help
+      against a login wall, which ModelRadar never bypasses. Re-enable only if it becomes public.

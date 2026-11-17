@@ -94,6 +94,24 @@ async def test_robots_txt_disallow_is_respected() -> None:
     assert server.feed_requests() == []  # the feed itself was never requested
 
 
+async def test_ignore_robots_override_fetches_a_disallowed_feed() -> None:
+    server = ScriptedServer(ok(FEED), robots="User-agent: *\nDisallow: /feed.xml\n")
+    outcome = await server.fetcher().fetch(URL, ignore_robots=True)
+    assert outcome.kind == "ok" and outcome.content == FEED
+    assert len(server.feed_requests()) == 1
+    assert all(r.headers["user-agent"] == USER_AGENT for r in server.requests)
+
+
+@pytest.mark.parametrize("status", [401, 403])
+async def test_override_never_bypasses_access_restrictions(status: int) -> None:
+    server = ScriptedServer(httpx.Response(status), robots="User-agent: *\nDisallow: /feed.xml\n")
+    outcome = await server.fetcher(max_attempts=3).fetch(URL, ignore_robots=True)
+    assert outcome.kind == "error" and outcome.status == status
+    assert len(server.feed_requests()) == 1  # not retried, nothing done to get around it
+    sent = {k.lower() for k in server.feed_requests()[0].headers}
+    assert not sent & {"authorization", "cookie", "proxy-authorization"}
+
+
 async def test_robots_txt_allowing_rules_are_followed() -> None:
     server = ScriptedServer(ok(FEED), robots="User-agent: *\nDisallow: /private/\n")
     assert (await server.fetcher().fetch(URL)).kind == "ok"

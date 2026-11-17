@@ -11,7 +11,7 @@ ModelRadar is a public-information site, not a SaaS product:
 - Every announcement links to its original official source. Titles are stored exactly as published.
 
 > **Status: Phases 0-2 complete; Phase 3 (frontend dashboard and read API) implemented.** The
-> worker collects real announcements from ten official feeds and the web app shows them.
+> worker collects real announcements from nine official feeds and the web app shows them.
 > See [docs/ROADMAP.md](docs/ROADMAP.md), [docs/DESIGN.md](docs/DESIGN.md),
 > [docs/API.md](docs/API.md), [docs/SOURCES.md](docs/SOURCES.md) and
 > [docs/INGESTION.md](docs/INGESTION.md).

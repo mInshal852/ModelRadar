@@ -133,14 +133,20 @@ class FeedFetcher:
     # --- requests ------------------------------------------------------------------------
 
     async def fetch(
-        self, url: str, etag: str | None = None, last_modified: str | None = None
+        self,
+        url: str,
+        etag: str | None = None,
+        last_modified: str | None = None,
+        *,
+        ignore_robots: bool = False,
     ) -> FetchOutcome:
         headers: dict[str, str] = {}
         if etag:
             headers["If-None-Match"] = etag
         if last_modified:
             headers["If-Modified-Since"] = last_modified
-        return await self._request(url, headers, check_robots=True)
+        # ignore_robots is an explicit per-source owner override; nothing else is bypassed.
+        return await self._request(url, headers, check_robots=not ignore_robots)
 
     async def _request(
         self, url: str, headers: dict[str, str], *, check_robots: bool

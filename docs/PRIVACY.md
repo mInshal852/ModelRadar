@@ -22,4 +22,5 @@ Database credentials live in a git-ignored `.env` generated locally by `scripts/
 ## Data outbound
 
 The worker (not visitors) contacts official company sources to collect public announcements,
-using an identifying User-Agent and respecting robots.txt (from Phase 1).
+using an identifying User-Agent and respecting robots.txt by default. The owner can override this per source
+(`ignore_robots_txt` in the source config, with a written reason; see [SOURCES.md](SOURCES.md)).
