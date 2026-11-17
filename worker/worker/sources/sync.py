@@ -167,6 +167,8 @@ def _source_values(source: SourceConfig) -> dict[str, Any]:
         else None
     )
     notes = source.verification_notes
+    if source.ignore_robots_txt:
+        notes = f"ROBOTS.TXT IGNORED (owner decision): {source.robots_override_reason}\n{notes}"
     if not source.enabled:
         notes = f"DISABLED: {source.disabled_reason}\n{notes}"
     return {
@@ -185,6 +187,7 @@ def _source_values(source: SourceConfig) -> dict[str, Any]:
         ),
         "extractor_config": source.extractor_config,
         "poll_interval_minutes": source.poll_interval_minutes,
+        "ignore_robots_txt": source.ignore_robots_txt,
     }
 
 

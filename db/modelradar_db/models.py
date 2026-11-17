@@ -15,6 +15,7 @@ from typing import Any
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -128,6 +129,8 @@ class Source(Base):
     relevance_rules: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     extractor_config: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     poll_interval_minutes: Mapped[int] = mapped_column(Integer)
+    # Owner decision: fetch this source even when its robots.txt disallows it (see docs/SOURCES.md).
+    ignore_robots_txt: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     etag: Mapped[str | None] = mapped_column(Text)
     last_modified: Mapped[str | None] = mapped_column(Text)
     last_synced_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))

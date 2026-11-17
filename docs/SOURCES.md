@@ -69,7 +69,7 @@ docker compose run --rm worker python -m worker.cli verify-sources
 ```
 
 Options: `--slug SLUG` (repeatable), `--include-disabled`, `--config-dir DIR`. The command
-fetches each feed (identifying User-Agent, robots.txt respected, no retries or workarounds) and
+fetches each feed (identifying User-Agent, robots.txt respected unless the source has the owner override, no retries or workarounds) and
 inspects what is really inside:
 
 - entries, and how many have a title, link, publication date and description;
@@ -82,7 +82,8 @@ Verdicts: `pass`, `pass_with_warnings` (for example some entries lack a descript
 the newest entry is over 180 days old) and `fail` (HTTP error, not a feed, no entries, most
 entries missing a title or link, mostly off-domain links, newest entry over 365 days old, rules
 removing everything, blocked by robots.txt). Missing dates and descriptions are never invented;
-they stay `NULL`. A blocked source (403, robots.txt, CAPTCHA) is reported and never bypassed.
+they stay `NULL`. A source blocked by 403 or a CAPTCHA is reported and never bypassed. robots.txt is the one
+exception, and only through the explicit per-source override described below.
 
 The command exits non-zero if an **enabled** source fails.
 
@@ -123,6 +124,22 @@ relevance_rules:
 
 Rules favour precision over recall; write the trade-off into `verification_notes`.
 
+## Overriding robots.txt (owner decision)
+
+By default every fetch respects the site's robots.txt. For a source whose announcements are
+important but whose robots.txt disallows the feed, the owner can set, on that source only:
+
+```yaml
+ignore_robots_txt: true
+robots_override_reason: >-
+  Why this source is fetched despite robots.txt.
+```
+
+The reason is required, is stored in the source's `verification_notes`, and the Sources API
+reports `ignores_robots_txt`. The override applies to `robots.txt` only: the honest User-Agent,
+rate limits, conditional requests and retries stay, and 403s, CAPTCHAs and login walls are still
+never bypassed. No source uses it at the moment (Midjourney's feed turned out to be behind a login).
+
 ## Disabling an unreliable source
 
 Set `enabled: false` and a `disabled_reason`, keep the verification notes, and run
@@ -159,5 +176,5 @@ source's URL therefore creates a new row and leaves the old one (reported as a w
 ## Current first batch
 
 Ten official companies and eleven sources are configured; nine sources are enabled and two are
-disabled (OpenAI's developer feed, and Midjourney's feed because its robots.txt forbids fetching). See `config/companies/` for each source's exact URL, hosting classification, scope,
+disabled (OpenAI's developer feed, and Midjourney's feed, which now redirects to a login area). See `config/companies/` for each source's exact URL, hosting classification, scope,
 verification notes and relevance rules.

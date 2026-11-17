@@ -298,7 +298,7 @@ async def list_sources(
                 text(
                     """
 SELECT s.id, s.name, s.kind, s.url, s.hosting, s.hosting_notes, s.content_scope,
-  s.verification_level, s.verified_at, s.verification_notes, s.poll_interval_minutes,
+  s.verification_level, s.verified_at, s.verification_notes, s.poll_interval_minutes, s.ignore_robots_txt,
   s.status, s.consecutive_failures, s.last_synced_at, s.last_error,
   c.slug AS company_slug, c.name AS company_name,
   (SELECT count(*) FROM announcements a WHERE a.source_id = s.id) AS announcement_count,
@@ -332,6 +332,7 @@ ORDER BY lower(c.name), lower(s.name), s.id
             verified_at=r["verified_at"],
             verification_notes=r["verification_notes"],
             poll_interval_minutes=r["poll_interval_minutes"],
+            ignores_robots_txt=r["ignore_robots_txt"],
             enabled=r["status"] != "disabled",
             status=r["status"],
             consecutive_failures=r["consecutive_failures"],

@@ -112,6 +112,8 @@ class SourceConfig(StrictModel):
     disabled_reason: str | None = None
     relevance_rules: RelevanceRules | None = None
     extractor_config: dict[str, Any] | None = None
+    ignore_robots_txt: bool = False
+    robots_override_reason: str | None = None
 
     @field_validator("url")
     @classmethod
@@ -133,6 +135,10 @@ class SourceConfig(StrictModel):
             raise ValueError("verified_at is required when verification_level is above http_only")
         if self.hosting == "official_third_party" and not self.hosting_notes:
             raise ValueError("hosting_notes must explain third-party hosting")
+        if self.ignore_robots_txt and not self.robots_override_reason:
+            raise ValueError("ignore_robots_txt needs a robots_override_reason")
+        if self.robots_override_reason and not self.ignore_robots_txt:
+            raise ValueError("robots_override_reason is only valid with ignore_robots_txt: true")
         if self.kind in INGESTIBLE_KINDS and self.extractor_config is not None:
             raise ValueError("extractor_config does not apply to RSS/Atom sources")
         return self

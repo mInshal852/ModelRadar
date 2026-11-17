@@ -44,6 +44,7 @@ class SourceRow:
     consecutive_failures: int
     relevance_rules_raw: Any
     last_run_started: dt.datetime | None
+    ignore_robots_txt: bool = False
 
     def relevance_rules(self) -> RelevanceRules | None:
         raw = self.relevance_rules_raw
@@ -78,7 +79,8 @@ async def load_sources(
     query = (
         "SELECT s.id, s.company_id, c.slug AS company_slug, s.name, s.kind, s.url, "
         "s.poll_interval_minutes, s.etag, s.last_modified, s.status, s.consecutive_failures, "
-        "s.relevance_rules, (SELECT max(r.started_at) FROM sync_runs r WHERE r.source_id = s.id) "
+        "s.relevance_rules, s.ignore_robots_txt, "
+        "(SELECT max(r.started_at) FROM sync_runs r WHERE r.source_id = s.id) "
         "AS last_run_started FROM sources s JOIN companies c ON c.id = s.company_id "
         "WHERE s.kind IN ('rss', 'atom') AND s.status IS DISTINCT FROM 'disabled' "
         "AND (CAST(:company AS text) IS NULL OR c.slug = :company) "
@@ -101,6 +103,7 @@ async def load_sources(
             consecutive_failures=r["consecutive_failures"],
             relevance_rules_raw=r["relevance_rules"],
             last_run_started=r["last_run_started"],
+            ignore_robots_txt=r["ignore_robots_txt"],
         )
         for r in rows
     ]
@@ -237,7 +240,12 @@ async def _ingest_locked(
         return await fail(None, f"invalid relevance rules in database: {type(exc).__name__}")
 
     try:
-        outcome = await fetcher.fetch(source.url, source.etag, source.last_modified)
+        outcome = await fetcher.fetch(
+            source.url,
+            source.etag,
+            source.last_modified,
+            ignore_robots=source.ignore_robots_txt,
+        )
     except Exception as exc:  # defensive: the fetcher should not raise
         return await fail(None, f"fetch failed: {type(exc).__name__}")
     report.http_status = outcome.status

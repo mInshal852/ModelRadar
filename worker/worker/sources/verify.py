@@ -87,9 +87,10 @@ def _robots_allows(client: httpx.Client, url: str) -> tuple[bool, str | None]:
     return False, "disallowed by robots.txt"
 
 
-def fetch_feed(client: httpx.Client, url: str) -> FetchResult:
-    """Fetch a feed politely. Never bypasses blocks: a refusal is reported as-is."""
-    allowed, reason = _robots_allows(client, url)
+def fetch_feed(client: httpx.Client, url: str, *, ignore_robots: bool = False) -> FetchResult:
+    """Fetch a feed politely. Only an explicit per-source owner override skips robots.txt;
+    other refusals (403, CAPTCHA, ...) are reported as-is."""
+    allowed, reason = (True, None) if ignore_robots else _robots_allows(client, url)
     if not allowed:
         return FetchResult(None, None, b"", error=reason)
     try:
@@ -229,7 +230,7 @@ def verify_source(
 ) -> VerificationReport:
     """Fetch and inspect one feed source."""
     now = now or dt.datetime.now(dt.UTC)
-    fetched = fetch_feed(client, source.url)
+    fetched = fetch_feed(client, source.url, ignore_robots=source.ignore_robots_txt)
     report = VerificationReport(
         source_slug=source.slug,
         url=source.url,

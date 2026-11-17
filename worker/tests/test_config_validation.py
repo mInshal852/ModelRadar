@@ -326,3 +326,19 @@ def test_duplicate_category_slugs(make_config: Builder) -> None:
 def test_category_count_is_enforced_by_default(make_config: Builder) -> None:
     _, errors = validate_config_dir(make_config())
     assert_error(errors, "expected 17 top-level categories")
+
+
+def test_robots_override_needs_a_reason_and_a_flag(make_config: Builder) -> None:
+    assert_error(
+        errors_for(make_config, acme=company(sources=[source(ignore_robots_txt=True)])),
+        "robots_override_reason",
+    )
+    assert_error(
+        errors_for(make_config, acme=company(sources=[source(robots_override_reason="why")])),
+        "robots_override_reason",
+    )
+    ok = errors_for(
+        make_config,
+        acme=company(sources=[source(ignore_robots_txt=True, robots_override_reason="owner")]),
+    )
+    assert ok == []

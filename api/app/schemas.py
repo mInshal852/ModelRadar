@@ -103,6 +103,7 @@ class Source(BaseModel):
     verified_at: dt.datetime | None
     verification_notes: str | None
     poll_interval_minutes: int
+    ignores_robots_txt: bool
     enabled: bool
     status: str | None  # null = never synchronised
     consecutive_failures: int
