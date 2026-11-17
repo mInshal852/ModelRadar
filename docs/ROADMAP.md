@@ -10,10 +10,10 @@
 | 4 | Run the full stack with real data, fix issues found, update docs | In progress |
 | 5 | Rule-based classification: announcement kind and categories | Not started |
 | 6 | Model detection: model names, versions, first-announced dates | Not started |
-| 7 | More official RSS/Atom sources (batch 1) | Not started |
-| 8 | Official GitHub and Hugging Face sources | Not started |
+| 7 | More official RSS/Atom sources, including companies from China, India, Russia and other countries | Not started |
+| 8 | Official non-blocked routes: GitHub, Hugging Face, official APIs | Not started |
 | 9 | HTML extraction in small gated batches (about 5-8 sources each) | Not started |
-| 10 | Frontend polish: Models, Categories, Dashboard, "new" indicator from publication date | Not started |
+| 10 | Frontend polish: Models, Categories, Dashboard, "new" indicator from publication date, **filter by country** (US, China, India, Russia, ...) | Not started |
 | 11 | Hardening: source-drift visibility, caching, performance, full browser tests | Not started |
 | 12 | Deployment: hosting, HTTPS, backups | Not started |
 
