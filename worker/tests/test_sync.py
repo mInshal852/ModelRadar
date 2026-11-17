@@ -189,7 +189,9 @@ async def test_real_config_disabled_source_is_marked_disabled(engine: AsyncEngin
     by_status = {r.status for r in rows}
     assert by_status == {None, "disabled"}
     disabled = [r for r in rows if r.status == "disabled"]
-    assert len(disabled) == 1 and disabled[0].verification_notes.startswith("DISABLED: ")
+    assert len(disabled) == 2 and all(
+        d.verification_notes.startswith("DISABLED: ") for d in disabled
+    )
 
 
 # --- config changes and preservation of existing data --------------------------------------

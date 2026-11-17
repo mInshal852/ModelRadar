@@ -76,7 +76,6 @@ def test_repository_config_matches_the_approved_first_batch() -> None:
         "mistral-news",
         "allen-ai-news",
         "stability-ai-news",
-        "midjourney-updates",
         "pika-blog",
         "voyage-ai-blog",
         "anthropic-api-release-notes",

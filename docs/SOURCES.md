@@ -158,6 +158,6 @@ source's URL therefore creates a new row and leaves the old one (reported as a w
 
 ## Current first batch
 
-Ten official companies and eleven sources are configured; ten sources are enabled and one is
-disabled. See `config/companies/` for each source's exact URL, hosting classification, scope,
+Ten official companies and eleven sources are configured; nine sources are enabled and two are
+disabled (OpenAI's developer feed, and Midjourney's feed because its robots.txt forbids fetching). See `config/companies/` for each source's exact URL, hosting classification, scope,
 verification notes and relevance rules.

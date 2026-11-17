@@ -20,3 +20,7 @@ sources:
       (8) or "Announcement" (7). Newest entry was 32 days old. All links are on
       updates.midjourney.com.
     poll_interval_minutes: 120
+    enabled: false
+    disabled_reason: >-
+      The feed's robots.txt disallows automated fetching (observed 2026-11-14), so the worker
+      refuses to fetch it. Re-enable only if the site's robots.txt allows it.
